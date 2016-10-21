@@ -6,10 +6,13 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EntityDamageSource;
+import net.minecraft.util.SoundCategory;
 import tonius.simplyjetpacks.SimplyJetpacks;
+import tonius.simplyjetpacks.client.audio.ModSounds;
 import tonius.simplyjetpacks.client.model.PackModelType;
 import tonius.simplyjetpacks.handler.SyncHandler;
 import tonius.simplyjetpacks.item.ItemPack;
@@ -20,8 +23,8 @@ import tonius.simplyjetpacks.util.SJStringHelper;
 import cofh.lib.util.helpers.FireworksHelper;
 import cofh.lib.util.helpers.MathHelper;
 import cofh.lib.util.helpers.StringHelper;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class JetpackPotato extends Jetpack {
     
@@ -42,7 +45,7 @@ public class JetpackPotato extends Jetpack {
             super.flyUser(user, stack, item, true);
             user.rotationYawHead += 37.5F;
             if (item.getFuelStored(stack) <= 0) {
-                user.setCurrentItemOrArmor(3, null);
+            	user.setItemStackToSlot(EntityEquipmentSlot.CHEST, null);
                 if (!user.worldObj.isRemote) {
                     user.worldObj.createExplosion(user, user.posX, user.posY, user.posZ, 4.0F, false);
                     for (int i = 0; i <= MathHelper.RANDOM.nextInt(3) + 4; i++) {
@@ -51,7 +54,7 @@ public class JetpackPotato extends Jetpack {
                     }
                     user.attackEntityFrom(new EntityDamageSource("jetpackpotato", user), 100.0F);
                     if (user instanceof EntityPlayer) {
-                        user.dropItem(Items.baked_potato, 1);
+                        user.dropItem(Items.BAKED_POTATO, 1);
                     }
                 }
             }
@@ -130,7 +133,7 @@ public class JetpackPotato extends Jetpack {
         NBTHelper.getNBT(itemStack).setInteger(TAG_ROCKET_TIMER, timer);
         if (timer == 0) {
             this.setFired(itemStack);
-            user.worldObj.playSoundAtEntity(user, SimplyJetpacks.RESOURCE_PREFIX + "rocket", 1.0F, 1.0F);
+            user.worldObj.playSound(user.posX, user.posY, user.posZ, ModSounds.ROCKET, SoundCategory.MASTER, 1.0F, 1.0F, false);
         }
     }
     

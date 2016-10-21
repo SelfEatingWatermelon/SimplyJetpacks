@@ -6,10 +6,10 @@ import net.minecraft.nbt.NBTTagCompound;
 public abstract class NBTHelper {
     
     public static NBTTagCompound getNBT(ItemStack stack) {
-        if (stack.stackTagCompound == null) {
-            stack.stackTagCompound = new NBTTagCompound();
+        if (!stack.hasTagCompound()) {
+        	stack.setTagCompound(new NBTTagCompound());
         }
-        return stack.stackTagCompound;
+        return stack.getTagCompound();
     }
     
     public static boolean getNBTBoolean(ItemStack stack, String tag, boolean fallback) {

@@ -5,7 +5,7 @@ import net.minecraftforge.fluids.IFluidTank;
 import tonius.simplyjetpacks.SimplyJetpacks;
 import cofh.lib.gui.GuiBase;
 import cofh.lib.gui.element.ElementFluidTank;
-import cofh.lib.render.RenderHelper;
+import cofh.lib.util.helpers.RenderHelper;
 
 public class ElementFluidTankAdv extends ElementFluidTank {
     

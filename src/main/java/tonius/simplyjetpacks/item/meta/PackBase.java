@@ -4,15 +4,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import tonius.simplyjetpacks.SimplyJetpacks;
@@ -27,8 +26,8 @@ import tonius.simplyjetpacks.util.NBTHelper;
 import tonius.simplyjetpacks.util.SJStringHelper;
 import cofh.api.energy.IEnergyContainerItem;
 import cofh.lib.util.helpers.StringHelper;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class PackBase {
     
@@ -48,7 +47,6 @@ public class PackBase {
     public int armorFuelPerHit = 0;
     public int enchantability = 0;
     
-    public IIcon icon;
     public FuelType fuelType = FuelType.ENERGY;
     public String fuelFluid = null;
     public PackModelType armorModel = PackModelType.FLAT;
@@ -174,8 +172,9 @@ public class PackBase {
     
     protected void chargeInventory(EntityLivingBase user, ItemStack stack, ItemPack item) {
         if (this.fuelType == FuelType.ENERGY) {
-            for (int i = 0; i <= 4; i++) {
-                ItemStack currentStack = user.getEquipmentInSlot(i);
+        	for (ItemStack currentStack : user.getEquipmentAndArmor()) {
+        	//for (int i = 0; i <= 4; i++) {
+                //ItemStack currentStack = user.getEquipmentInSlot(i);
                 if (currentStack != null && currentStack != stack && currentStack.getItem() instanceof IEnergyContainerItem) {
                     IEnergyContainerItem heldEnergyItem = (IEnergyContainerItem) currentStack.getItem();
                     if (this.usesFuel) {
@@ -194,14 +193,19 @@ public class PackBase {
         return this.name + "." + this.tier + (armoredInfo && this.isArmored && this.showArmored ? ".armored" : "");
     }
     
+    public String getPackTextureName(ModType modType) {
+        String flat = Config.enableArmor3DModels || this.armorModel == PackModelType.FLAT ? "" : ".flat";
+        return this.getBaseName(true) + modType.suffix + flat;
+    }
+    
     protected void toggleState(boolean on, ItemStack stack, String type, String tag, EntityPlayer player, boolean showInChat) {
-        stack.stackTagCompound.setBoolean(tag, !on);
+        stack.getTagCompound().setBoolean(tag, !on);
         
         if (player != null && showInChat) {
             String color = on ? StringHelper.LIGHT_RED : StringHelper.BRIGHT_GREEN;
             type = type != null && !type.equals("") ? "chat." + this.name + "." + type + ".on" : "chat." + this.name + ".on";
             String msg = SJStringHelper.localize(type) + " " + color + SJStringHelper.localize("chat." + (on ? "disabled" : "enabled"));
-            player.addChatMessage(new ChatComponentText(msg));
+            player.addChatMessage(new TextComponentString(msg));
         }
     }
     
@@ -231,22 +235,9 @@ public class PackBase {
     }
     
     @SideOnly(Side.CLIENT)
-    public void registerIcons(IIconRegister register, ModType modType) {
-        this.icon = register.registerIcon(SimplyJetpacks.RESOURCE_PREFIX + this.getBaseName(true) + modType.suffix);
-    }
-    
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(ItemStack stack) {
-        if (this.icon != null) {
-            return this.icon;
-        }
-        return null;
-    }
-    
-    @SideOnly(Side.CLIENT)
-    public String getArmorTexture(ItemStack stack, Entity entity, int slot, ModType modType) {
+    public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, ModType modType) {
         String flat = Config.enableArmor3DModels || this.armorModel == PackModelType.FLAT ? "" : ".flat";
-        return SimplyJetpacks.RESOURCE_PREFIX + "textures/armor/" + this.getBaseName(true) + modType.suffix + flat + ".png";
+        return SimplyJetpacks.RESOURCE_PREFIX + "textures/armor/" + this.getPackTextureName(modType) + ".png";
     }
     
     @SideOnly(Side.CLIENT)

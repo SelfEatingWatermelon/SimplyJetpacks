@@ -3,8 +3,9 @@ package tonius.simplyjetpacks.integration;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 import tonius.simplyjetpacks.SimplyJetpacks;
-import cpw.mods.fml.common.event.FMLInterModComms;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
 
 public abstract class EIORecipes {
     
@@ -40,8 +41,8 @@ public abstract class EIORecipes {
     
     private static void appendItemStack(StringBuilder sb, ItemStack stack) {
         if (stack != null) {
-            String[] itemName = Item.itemRegistry.getNameForObject(stack.getItem()).split(":");
-            sb.append("<itemStack modID=\"" + itemName[0] + "\" itemName=\"" + itemName[1] + "\" itemMeta=\"" + stack.getItemDamage() + "\" number=\"" + stack.stackSize + "\" />");
+        	ResourceLocation itemResource = Item.REGISTRY.getNameForObject(stack.getItem());
+            sb.append("<itemStack modID=\"" + itemResource.getResourceDomain() + "\" itemName=\"" + itemResource.getResourcePath() + "\" itemMeta=\"" + stack.getItemDamage() + "\" number=\"" + stack.stackSize + "\" />");
         }
     }
     
