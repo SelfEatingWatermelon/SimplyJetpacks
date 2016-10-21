@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 
 import org.lwjgl.opengl.GL11;
@@ -13,9 +14,9 @@ import tonius.simplyjetpacks.client.util.RenderUtils;
 import tonius.simplyjetpacks.client.util.RenderUtils.HUDPositions;
 import tonius.simplyjetpacks.config.Config;
 import tonius.simplyjetpacks.item.IHUDInfoProvider;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import cpw.mods.fml.common.gameevent.TickEvent.RenderTickEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
 public class HUDTickHandler {
     
@@ -24,7 +25,7 @@ public class HUDTickHandler {
     private static void tickEnd() {
         if (mc.thePlayer != null) {
             if ((mc.currentScreen == null || Config.showHUDWhileChatting && mc.currentScreen instanceof GuiChat) && !mc.gameSettings.hideGUI && !mc.gameSettings.showDebugInfo) {
-                ItemStack chestplate = mc.thePlayer.getCurrentArmor(2);
+                ItemStack chestplate = mc.thePlayer.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
                 if (chestplate != null && chestplate.getItem() instanceof IHUDInfoProvider) {
                     IHUDInfoProvider provider = (IHUDInfoProvider) chestplate.getItem();
                     
@@ -40,7 +41,7 @@ public class HUDTickHandler {
                     
                     int i = 0;
                     for (String s : info) {
-                        RenderUtils.drawStringAtHUDPosition(s, HUDPositions.values()[Config.HUDPosition], mc.fontRenderer, Config.HUDOffsetX, Config.HUDOffsetY, Config.HUDScale, 0xeeeeee, true, i);
+                        RenderUtils.drawStringAtHUDPosition(s, HUDPositions.values()[Config.HUDPosition], mc.fontRendererObj, Config.HUDOffsetX, Config.HUDOffsetY, Config.HUDScale, 0xeeeeee, true, i);
                         i++;
                     }
                     

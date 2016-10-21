@@ -2,6 +2,7 @@ package tonius.simplyjetpacks.item;
 
 import java.util.List;
 
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemStack;
@@ -10,22 +11,27 @@ import net.minecraft.nbt.NBTTagFloat;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityMobSpawner;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import tonius.simplyjetpacks.SimplyJetpacks;
 import tonius.simplyjetpacks.setup.ModCreativeTab;
 import tonius.simplyjetpacks.setup.ModItems;
 import tonius.simplyjetpacks.util.SJStringHelper;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemMysteriousPotato extends ItemRegistered {
     
     public ItemMysteriousPotato(String registryName) {
         super(registryName);
         
-        this.setUnlocalizedName(SimplyJetpacks.PREFIX + "mysteriousPotato");
-        this.setTextureName("potato_poisonous");
+        this.setUnlocalizedName(SimplyJetpacks.PREFIX + registryName);
         this.setCreativeTab(ModCreativeTab.instance);
+        SimplyJetpacks.proxy.registerItemModelResourceLocation(this, 0, SimplyJetpacks.MODID + ":" + registryName, "inventory");
     }
     
     @Override
@@ -37,19 +43,20 @@ public class ItemMysteriousPotato extends ItemRegistered {
     
     @Override
     public EnumRarity getRarity(ItemStack itemStack) {
-        return EnumRarity.epic;
+        return EnumRarity.EPIC;
     }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public boolean hasEffect(ItemStack itemStack, int pass) {
-        return pass == 0;
-    }
-    
-    @Override
-    public boolean onItemUse(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int meta, float hitX, float hitY, float hitZ) {
+
+	@Override
+	public boolean hasEffect(ItemStack stack) {
+		return true;
+	}
+
+	// TODO: Potato changes spawner zombie => pig
+	/*
+	@Override
+	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (!world.isRemote) {
-            TileEntity tile = world.getTileEntity(x, y, z);
+            TileEntity tile = world.getTileEntity(pos);
             if (tile instanceof TileEntityMobSpawner) {
                 NBTTagCompound tag = new NBTTagCompound();
                 tile.writeToNBT(tag);
@@ -93,7 +100,9 @@ public class ItemMysteriousPotato extends ItemRegistered {
                 tile.readFromNBT(tag);
             }
         }
-        return true;
+
+        return EnumActionResult.SUCCESS;
     }
-    
+    */
+
 }

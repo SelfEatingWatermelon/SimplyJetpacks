@@ -7,19 +7,21 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.minecraft.client.model.ModelBiped;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.ISpecialArmor;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
@@ -40,9 +42,9 @@ import tonius.simplyjetpacks.util.NBTHelper;
 import tonius.simplyjetpacks.util.SJStringHelper;
 import cofh.api.energy.IEnergyContainerItem;
 import cofh.lib.util.helpers.MathHelper;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemPack<T extends PackBase> extends ItemArmor implements IControllableArmor, ISpecialArmor, IEnergyContainerItem, IFluidContainerItem, IHUDInfoProvider {
     
@@ -52,14 +54,16 @@ public class ItemPack<T extends PackBase> extends ItemArmor implements IControll
     private final Map<Integer, T> packs = new LinkedHashMap<Integer, T>();
     
     public ItemPack(ModType modType, String registryName) {
-        super(ArmorMaterial.IRON, 2, 1);
+    	// TODO: All jetpacks are equivalent to iron armor... Need to use custom materials
+        super(ArmorMaterial.IRON, 1, EntityEquipmentSlot.CHEST);
         this.modType = modType;
         this.setUnlocalizedName(SimplyJetpacks.PREFIX + "pack" + modType.suffix);
+        this.setRegistryName(new ResourceLocation(SimplyJetpacks.MODID, registryName));
         this.setHasSubtypes(true);
         this.setMaxDamage(0);
         this.setCreativeTab(ModCreativeTab.instance);
         
-        GameRegistry.registerItem(this, registryName);
+        GameRegistry.register(this);
     }
     
     public ItemStack putPack(int meta, T pack, boolean returnFull) {
@@ -68,6 +72,7 @@ public class ItemPack<T extends PackBase> extends ItemArmor implements IControll
         if (returnFull) {
             this.addFuel(stack, this.getMaxFuelStored(stack), false);
         }
+        SimplyJetpacks.proxy.registerItemModelResourceLocation(this, meta, SimplyJetpacks.MODID + ":" + pack.getPackTextureName(this.modType), "inventory");
         return stack;
     }
     
@@ -178,34 +183,7 @@ public class ItemPack<T extends PackBase> extends ItemArmor implements IControll
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerIcons(IIconRegister register) {
-        for (T pack : this.packs.values()) {
-            pack.registerIcons(register, this.modType);
-        }
-    }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(ItemStack stack, int pass) {
-        T pack = this.packs.get(stack.getItemDamage());
-        if (pack != null) {
-            IIcon icon = pack.getIcon(stack);
-            if (icon != null) {
-                return icon;
-            }
-        }
-        return super.getIcon(stack, pass);
-    }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public boolean requiresMultipleRenderPasses() {
-        return true;
-    }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public String getArmorTexture(ItemStack stack, Entity entity, int slot, String type) {
+	public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
         T pack = this.getPack(stack);
         if (pack != null) {
             return pack.getArmorTexture(stack, entity, slot, this.modType);
@@ -215,7 +193,7 @@ public class ItemPack<T extends PackBase> extends ItemArmor implements IControll
     
     @Override
     @SideOnly(Side.CLIENT)
-    public ModelBiped getArmorModel(EntityLivingBase entityLiving, ItemStack stack, int armorSlot) {
+	public ModelBiped getArmorModel(EntityLivingBase entityLiving, ItemStack stack, EntityEquipmentSlot armorSlot, ModelBiped defaultModel) {
         T pack = this.getPack(stack);
         if (pack != null && pack.armorModel != null && Config.enableArmor3DModels) {
             ModelBiped model = RenderUtils.getArmorModel(pack, entityLiving);
@@ -223,7 +201,7 @@ public class ItemPack<T extends PackBase> extends ItemArmor implements IControll
                 return model;
             }
         }
-        return super.getArmorModel(entityLiving, stack, armorSlot);
+        return super.getArmorModel(entityLiving, stack, armorSlot, defaultModel);
     }
     
     // control
@@ -254,11 +232,11 @@ public class ItemPack<T extends PackBase> extends ItemArmor implements IControll
     
     // armor
     protected int getFuelPerDamage(ItemStack stack, T pack) {
-        if (ModEnchantments.fuelEffeciency == null) {
+        if (ModEnchantments.fuelEfficiency == null) {
             return pack.armorFuelPerHit;
         }
-        
-        int fuelEfficiencyLevel = MathHelper.clampI(EnchantmentHelper.getEnchantmentLevel(ModEnchantments.fuelEffeciency.effectId, stack), 0, 4);
+
+        int fuelEfficiencyLevel = MathHelper.clamp(EnchantmentHelper.getEnchantmentLevel(ModEnchantments.fuelEfficiency, stack), 0, 4);
         return (int) Math.round(pack.armorFuelPerHit * (5 - fuelEfficiencyLevel) / 5.0D);
     }
     
@@ -449,6 +427,7 @@ public class ItemPack<T extends PackBase> extends ItemArmor implements IControll
     
     @Override
     public int fill(ItemStack container, FluidStack resource, boolean doFill) {
+    	SimplyJetpacks.logger.info("container=" + container + " resource=" + resource);
         if (resource == null) {
             return 0;
         }

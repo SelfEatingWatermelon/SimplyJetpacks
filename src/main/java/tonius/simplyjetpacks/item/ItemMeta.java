@@ -4,32 +4,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
 import net.minecraftforge.oredict.OreDictionary;
 import tonius.simplyjetpacks.SimplyJetpacks;
 import tonius.simplyjetpacks.setup.ModCreativeTab;
 import tonius.simplyjetpacks.util.SJStringHelper;
 import cofh.lib.util.helpers.StringHelper;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemMeta extends ItemRegistered {
     
     protected final Map<Integer, MetaItem> metaItems = new HashMap<Integer, MetaItem>();
-    protected final Map<Integer, IIcon> icons = new HashMap<Integer, IIcon>();
     protected int highestMeta = 0;
     
     public ItemMeta(String registryName) {
         super(registryName);
-        
-        this.setUnlocalizedName(SimplyJetpacks.PREFIX + registryName);
         this.setHasSubtypes(true);
         this.setMaxDamage(0);
         this.setCreativeTab(ModCreativeTab.instance);
@@ -52,8 +49,9 @@ public class ItemMeta extends ItemRegistered {
         }
         
         if (registerCustomItemStack) {
-            GameRegistry.registerCustomItemStack(item.name, itemStack);
+        	SimplyJetpacks.proxy.registerItemModelResourceLocation(itemStack.getItem(), itemStack.getItemDamage(), SimplyJetpacks.MODID + ":" + item.name, "inventory");
         }
+
         if (registerOreDict) {
             OreDictionary.registerOre(item.name, itemStack);
         }
@@ -107,31 +105,12 @@ public class ItemMeta extends ItemRegistered {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean hasEffect(ItemStack itemStack, int pass) {
-        if (pass == 0) {
-            MetaItem metaItem = this.getMetaItem(itemStack);
-            if (metaItem != null && metaItem.glow) {
-                return true;
-            }
+    public boolean hasEffect(ItemStack itemStack) {
+        MetaItem metaItem = this.getMetaItem(itemStack);
+        if (metaItem != null && metaItem.glow) {
+            return true;
         }
-        return super.hasEffect(itemStack, pass);
-    }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void registerIcons(IIconRegister register) {
-        for (int i = 0; i <= this.highestMeta; i++) {
-            MetaItem metaItem = this.metaItems.get(i);
-            if (metaItem != null) {
-                this.icons.put(i, register.registerIcon(SimplyJetpacks.RESOURCE_PREFIX + metaItem.name));
-            }
-        }
-    }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIconFromDamage(int damage) {
-        return this.icons.get(damage);
+        return super.hasEffect(itemStack);
     }
     
     public static class MetaItem {

@@ -3,8 +3,8 @@ package tonius.simplyjetpacks.setup;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ModCreativeTab extends CreativeTabs {
     
@@ -12,13 +12,13 @@ public class ModCreativeTab extends CreativeTabs {
     
     private ModCreativeTab() {
         super("tabSimplyJetpacks");
-        this.func_111229_a(ModEnchantments.enchantType);
+        this.setRelevantEnchantmentTypes(ModEnchantments.enchantType);
     }
     
     @Override
     @SideOnly(Side.CLIENT)
     public Item getTabIconItem() {
-        return ModItems.components;
+        return ModItems.jetpackIcon.getItem();
     }
     
     @Override

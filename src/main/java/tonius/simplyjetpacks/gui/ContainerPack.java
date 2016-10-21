@@ -2,7 +2,8 @@ package tonius.simplyjetpacks.gui;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ICrafting;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.IContainerListener;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
@@ -10,8 +11,8 @@ import net.minecraftforge.fluids.FluidTank;
 import tonius.simplyjetpacks.item.ItemPack;
 import tonius.simplyjetpacks.item.meta.PackBase;
 import cofh.api.energy.EnergyStorage;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ContainerPack extends Container {
     
@@ -52,7 +53,7 @@ public class ContainerPack extends Container {
     
     @Override
     public boolean canInteractWith(EntityPlayer player) {
-        return player.getCurrentArmor(2) == this.chestplate;
+        return player.getItemStackFromSlot(EntityEquipmentSlot.CHEST) == this.chestplate;
     }
     
     @Override
@@ -62,9 +63,9 @@ public class ContainerPack extends Container {
         int fuel = this.packItem.getFuelStored(this.chestplate);
         
         if (fuel != this.lastFuel) {
-            for (int i = 0; i < this.crafters.size(); ++i) {
-                ((ICrafting) this.crafters.get(i)).sendProgressBarUpdate(this, 0, (short) (fuel >> 16));
-                ((ICrafting) this.crafters.get(i)).sendProgressBarUpdate(this, 1, (short) (fuel & 0xFFFF));
+            for (int i = 0; i < this.listeners.size(); ++i) {
+                ((IContainerListener) this.listeners.get(i)).sendProgressBarUpdate(this, 0, (short) (fuel >> 16));
+                ((IContainerListener) this.listeners.get(i)).sendProgressBarUpdate(this, 1, (short) (fuel & 0xFFFF));
             }
             this.lastFuel = fuel;
         }

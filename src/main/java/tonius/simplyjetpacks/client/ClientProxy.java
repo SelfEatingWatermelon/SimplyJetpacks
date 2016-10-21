@@ -1,23 +1,32 @@
 package tonius.simplyjetpacks.client;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiErrorScreen;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.Vec3;
+import net.minecraft.item.Item;
+import net.minecraft.util.math.Vec3d;
+//import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import tonius.simplyjetpacks.CommonProxy;
+import tonius.simplyjetpacks.SimplyJetpacks;
 import tonius.simplyjetpacks.client.handler.ClientTickHandler;
 import tonius.simplyjetpacks.client.handler.HUDTickHandler;
 import tonius.simplyjetpacks.client.handler.KeyHandler;
 import tonius.simplyjetpacks.client.util.ParticleUtils;
+import tonius.simplyjetpacks.item.ItemMeta;
 import tonius.simplyjetpacks.setup.ParticleType;
 import cofh.lib.util.helpers.MathHelper;
-import cpw.mods.fml.client.CustomModLoadingErrorDisplayException;
-import cpw.mods.fml.common.FMLCommonHandler;
+import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.client.CustomModLoadingErrorDisplayException;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class ClientProxy extends CommonProxy {
     
@@ -27,36 +36,37 @@ public class ClientProxy extends CommonProxy {
     public void registerHandlers() {
         super.registerHandlers();
         
-        FMLCommonHandler.instance().bus().register(new ClientTickHandler());
-        FMLCommonHandler.instance().bus().register(new KeyHandler());
-        FMLCommonHandler.instance().bus().register(new HUDTickHandler());
+        MinecraftForge.EVENT_BUS.register(new ClientTickHandler());
+        MinecraftForge.EVENT_BUS.register(new KeyHandler());
+        MinecraftForge.EVENT_BUS.register(new HUDTickHandler());
     }
     
     @Override
+    public void registerItemModelResourceLocation(Item item, int metadata, String resourcePath, String modelType) {
+    	ModelLoader.setCustomModelResourceLocation(item, metadata, new ModelResourceLocation(resourcePath, modelType));
+    }
+
+    @Override
     public void showJetpackParticles(World world, EntityLivingBase wearer, ParticleType particle) {
         if (mc.gameSettings.particleSetting == 0 || mc.gameSettings.particleSetting == 1 && mc.theWorld.getTotalWorldTime() % 4L == 0) {
-            Vec3 userPos = Vec3.createVectorHelper(wearer.posX, wearer.posY, wearer.posZ);
-            
-            if (!wearer.equals(mc.thePlayer)) {
-                userPos = userPos.addVector(0, 1.6D, 0);
-            }
+            Vec3d userPos = new Vec3d(wearer.posX, wearer.posY + 1.6D, wearer.posZ);
             
             Random rand = MathHelper.RANDOM;
             
-            Vec3 vLeft = Vec3.createVectorHelper(-0.28D, -0.95D, -0.38D);
-            vLeft.rotateAroundY((float) Math.toRadians(-wearer.renderYawOffset));
+            Vec3d vLeft = new Vec3d(-0.25D, -0.95D, -0.38D);
+            vLeft = vLeft.rotateYaw((float) Math.toRadians(-wearer.renderYawOffset));
             
-            Vec3 vRight = Vec3.createVectorHelper(0.28D, -0.95D, -0.38D);
-            vRight.rotateAroundY((float) Math.toRadians(-wearer.renderYawOffset));
+            Vec3d vRight = new Vec3d(0.25D, -0.95D, -0.38D);
+            vRight = vRight.rotateYaw((float) Math.toRadians(-wearer.renderYawOffset));
             
-            Vec3 vCenter = Vec3.createVectorHelper((rand.nextFloat() - 0.5F) * 0.25F, -0.95D, -0.38D);
-            vCenter.rotateAroundY((float) Math.toRadians(-wearer.renderYawOffset));
+            Vec3d vCenter = new Vec3d((rand.nextFloat() - 0.5F) * 0.25F, -0.95D, -0.38D);
+            vCenter = vCenter.rotateYaw((float) Math.toRadians(-wearer.renderYawOffset));
             
             vLeft = vLeft.addVector(-wearer.motionX * 0.2D, -wearer.motionY * 0.2D, -wearer.motionZ * 0.2D);
             vRight = vRight.addVector(-wearer.motionX * 0.2D, -wearer.motionY * 0.2D, -wearer.motionZ * 0.2D);
             vCenter = vCenter.addVector(-wearer.motionX * 0.2D, -wearer.motionY * 0.2D, -wearer.motionZ * 0.2D);
             
-            Vec3 v = userPos.addVector(vLeft.xCoord, vLeft.yCoord, vLeft.zCoord);
+            Vec3d v = userPos.addVector(vLeft.xCoord, vLeft.yCoord, vLeft.zCoord);
             ParticleUtils.spawnParticle(particle, world, v.xCoord, v.yCoord, v.zCoord, rand.nextDouble() * 0.05D - 0.025D, -0.2D, rand.nextDouble() * 0.05D - 0.025D);
             
             v = userPos.addVector(vRight.xCoord, vRight.yCoord, vRight.zCoord);

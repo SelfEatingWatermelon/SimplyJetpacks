@@ -8,16 +8,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.MovingSound;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
 import tonius.simplyjetpacks.SimplyJetpacks;
 import tonius.simplyjetpacks.handler.SyncHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class SoundJetpack extends MovingSound {
-    
-    private static final ResourceLocation SOUND = new ResourceLocation(SimplyJetpacks.RESOURCE_PREFIX + "jetpack");
-    private static final ResourceLocation SOUND_OTHER = new ResourceLocation(SimplyJetpacks.RESOURCE_PREFIX + "jetpack_other");
     
     private static final Map<Integer, SoundJetpack> playingFor = Collections.synchronizedMap(new HashMap<Integer, SoundJetpack>());
     private static final Minecraft mc = Minecraft.getMinecraft();
@@ -26,7 +24,7 @@ public class SoundJetpack extends MovingSound {
     private int fadeOut = -1;
     
     public SoundJetpack(EntityLivingBase target) {
-        super(target == mc.thePlayer ? SOUND : SOUND_OTHER);
+        super(target == mc.thePlayer ? ModSounds.SOUND : ModSounds.SOUND_OTHER, SoundCategory.PLAYERS);
         this.repeat = true;
         this.user = target;
         playingFor.put(target.getEntityId(), this);

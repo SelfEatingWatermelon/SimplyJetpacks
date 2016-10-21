@@ -2,7 +2,7 @@ package tonius.simplyjetpacks.integration;
 
 import net.minecraft.item.ItemStack;
 import tonius.simplyjetpacks.SimplyJetpacks;
-import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public abstract class TEItems {
     
@@ -24,20 +24,20 @@ public abstract class TEItems {
     public static void init() {
         SimplyJetpacks.logger.info("Stealing Thermal Expansion's items");
         
-        capacitorBasic = GameRegistry.findItemStack("ThermalExpansion", "capacitorBasic", 1);
-        capacitorHardened = GameRegistry.findItemStack("ThermalExpansion", "capacitorHardened", 1);
-        capacitorReinforced = GameRegistry.findItemStack("ThermalExpansion", "capacitorReinforced", 1);
-        capacitorResonant = GameRegistry.findItemStack("ThermalExpansion", "capacitorResonant", 1);
-        cellBasic = GameRegistry.findItemStack("ThermalExpansion", "cellBasic", 1);
-        dynamoReactant = GameRegistry.findItemStack("ThermalExpansion", "dynamoReactant", 1);
-        dynamoMagmatic = GameRegistry.findItemStack("ThermalExpansion", "dynamoMagmatic", 1);
-        dynamoEnervation = GameRegistry.findItemStack("ThermalExpansion", "dynamoEnervation", 1);
-        dynamoSteam = GameRegistry.findItemStack("ThermalExpansion", "dynamoSteam", 1);
-        frameCellReinforcedFull = GameRegistry.findItemStack("ThermalExpansion", "frameCellReinforcedFull", 1);
-        frameIlluminator = GameRegistry.findItemStack("ThermalExpansion", "frameIlluminator", 1);
-        pneumaticServo = GameRegistry.findItemStack("ThermalExpansion", "pneumaticServo", 1);
-        powerCoilElectrum = GameRegistry.findItemStack("ThermalExpansion", "powerCoilElectrum", 1);
-        powerCoilGold = GameRegistry.findItemStack("ThermalExpansion", "powerCoilGold", 1);
+        capacitorBasic = new ItemStack(GameRegistry.findItem("ThermalExpansion", "capacitorBasic"), 1);
+        capacitorHardened = new ItemStack(GameRegistry.findItem("ThermalExpansion", "capacitorHardened"), 1);
+        capacitorReinforced = new ItemStack(GameRegistry.findItem("ThermalExpansion", "capacitorReinforced"), 1);
+        capacitorResonant = new ItemStack(GameRegistry.findItem("ThermalExpansion", "capacitorResonant"), 1);
+        cellBasic = new ItemStack(GameRegistry.findItem("ThermalExpansion", "cellBasic"), 1);
+        dynamoReactant = new ItemStack(GameRegistry.findItem("ThermalExpansion", "dynamoReactant"), 1);
+        dynamoMagmatic = new ItemStack(GameRegistry.findItem("ThermalExpansion", "dynamoMagmatic"), 1);
+        dynamoEnervation = new ItemStack(GameRegistry.findItem("ThermalExpansion", "dynamoEnervation"), 1);
+        dynamoSteam = new ItemStack(GameRegistry.findItem("ThermalExpansion", "dynamoSteam"), 1);
+        frameCellReinforcedFull = new ItemStack(GameRegistry.findItem("ThermalExpansion", "frameCellReinforcedFull"), 1);
+        frameIlluminator = new ItemStack(GameRegistry.findItem("ThermalExpansion", "frameIlluminator"), 1);
+        pneumaticServo = new ItemStack(GameRegistry.findItem("ThermalExpansion", "pneumaticServo"), 1);
+        powerCoilElectrum = new ItemStack(GameRegistry.findItem("ThermalExpansion", "powerCoilElectrum"), 1);
+        powerCoilGold = new ItemStack(GameRegistry.findItem("ThermalExpansion", "powerCoilGold"), 1);
     }
     
 }
